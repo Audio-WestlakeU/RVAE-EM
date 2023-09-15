@@ -1,0 +1,5 @@
+.vscode
+data
+logs/U/
+logs/S/
+**/__pycache__/**

@@ -1,0 +1,139 @@
+{
+    "seed": 42,
+    "num_workers": 48,
+    "use_amp": true,
+    "dist_config": {
+        "dist_backend": "nccl",
+        "dist_url": "tcp://localhost:54321",
+        "world_size": 1
+    },
+    "data_setting_train": {
+        "wav_clean_root": "/mnt/inspurfs/home/wangpengyu/dataset/wsj0/si_tr_s",
+        "rir_root": "/mnt/inspurfs/home/wangpengyu/pytorch-template-master/v8/data/rirs/train",
+        "spch_len": 5.104,
+        "norm_mode": "time"
+    },
+    "data_setting_val": {
+        "wav_clean_root": "/mnt/inspurfs/home/wangpengyu/dataset/wsj0/si_et_05",
+        "rir_root": "/mnt/inspurfs/home/wangpengyu/pytorch-template-master/v8/data/rirs/test",
+        "spch_len": 5.104,
+        "norm_mode": "time"
+    },
+    "data_setting_test": {
+        "spch_dir": "/mnt/inspurfs/home/wangpengyu/pytorch-template-master/v8/data/wavs/test_REVERB/input"
+    },
+    "batch_size": [
+        64,
+        64,
+        24
+    ],
+    "model": {
+        "dim_x": 512,
+        "dim_z": 32,
+        "gru_dim_x_enc": 512,
+        "gru_dim_z_enc": 256,
+        "gru_dim_x_dec": 512,
+        "pre_conv_enc": [
+            1,
+            64,
+            1,
+            1,
+            0
+        ],
+        "pre_conv_dec": [
+            2,
+            64,
+            1,
+            1,
+            0
+        ],
+        "resblock_enc": [
+            [
+                64,
+                64,
+                3,
+                1,
+                1
+            ],
+            [
+                64,
+                64,
+                3,
+                1,
+                1
+            ]
+        ],
+        "resblock_dec": [
+            [
+                64,
+                64,
+                3,
+                1,
+                1
+            ],
+            [
+                64,
+                64,
+                3,
+                1,
+                1
+            ]
+        ],
+        "post_conv_enc": [
+            64,
+            1,
+            1,
+            1,
+            0
+        ],
+        "post_conv_dec": [
+            64,
+            1,
+            1,
+            1,
+            0
+        ],
+        "num_resblock": 8,
+        "num_GRU_layer_enc": 1,
+        "num_GRU_layer_dec": 1,
+        "dense_zmean_zlogvar": [
+            256,
+            256,
+            32
+        ],
+        "dense_activation_type": "tanh",
+        "dropout_p": 0.2,
+        "batch_norm": false
+    },
+    "optimizer": {
+        "type": "adamw",
+        "kwargs": {
+            "lr": 1e-04
+        }
+    },
+    "lr_scheduler": {
+        "type": "none",
+        "kwargs": {
+            "step_size": 500,
+            "gamma": 0.1,
+            "last_epoch": -1
+        }
+    },
+    "gradient_clip": 10,
+    "beta": 1,
+    "beta_zero_step": 1000,
+    "beta_warmup_step": 500,
+    "beta_holdon_step": 500,
+    "stft_setting": {
+        "fs": 16000,
+        "nfft": 1024,
+        "hop": 256,
+        "win": "hann"
+    },
+    "EM_kwargs": {
+        "max_steps": 100,
+        "eps": 0.001,
+        "noi_pow_scale": 1000,
+        "CTF_P": 30
+    }
+}
