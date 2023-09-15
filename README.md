@@ -16,9 +16,59 @@ The overview of RVAE-EM is
 
 ## 2. Get started
 ### 2.1 Requirements
+
+See `requirements.txt`.
+
 ### 2.2 Prepare datasets
+
+For training and validating, you should prepare directories of 
+ - clean speech (from WSJ0 corpus in our experiments)
+ - reverberant-dry-paired RIRs (simulated with gpuRIR toolbox in our experiments)
+
+with `.wav` files.
+The directory of paired RIRs should have two subdirectories `noisy/` and `clean/`, with the same filenames present in both.
+
+For testing, you should prepare directory of reverberant recordings with `.wav` files.
+
+We provide tools for simulating RIRs and generating testset, see `prepare_data/gen_rirs.py` and `prepare_data/gen_testset.py`.
+
 ### 2.3 Train proposed RVAE-EM-U (unsupervised)
+
+Unsupervised training with GPUs:
+```
+# GPU setting
+export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
+export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
+
+# start a new training process or resume training (if possible)
+python train_u.py -c [config.json] -p [save_path]
+
+# use pretrained model parameters
+python train_u.py -c [config.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
+```
+
 ### 2.4 Train proposed RVAE-EM-S (supervised)
+
+Supervised training with GPUs:
+```
+# GPU setting
+export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
+export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
+
+# start a new training process
+python train_s.py -c [config.json] -p [save_path] --start_ckpt [checkpoint_from_unsupervised_training]
+
+# resume training
+python train_s.py -c [config.json] -p [save_path]
+
+# use pretrained model parameters
+python train_s.py -c [config.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
+```
+
+
+
+
+
 ### 2.5 Test & evaluate
 ## 3. Performance
 ## 4. Citation

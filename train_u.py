@@ -27,7 +27,6 @@ from utils.utils import (
     save_checkpoint,
     plot_spectrogram,
     wav_path2txt,
-    # TxtLogger,
 )
 from model.RVAE import RVAE as MODEL
 from model.lossF import LossF
@@ -343,6 +342,16 @@ def train(rank, a, c):
                     model.train()
 
             steps += 1
+
+        if scheduler:
+            scheduler.step()
+
+        if rank == 0:
+            print(
+                "Time taken for epoch {} is {} sec\n".format(
+                    epoch + 1, int(time.time() - start)
+                )
+            )
 
 
 def main():
