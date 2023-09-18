@@ -1,0 +1,11 @@
+wav_clean_root: /mnt/inspurfs/home/wangpengyu/dataset/wsj0/si_tr_s
+wav_save_root: /mnt/inspurfs/home/wangpengyu/RVAE/data/wavs/train
+sample_rate: 16000
+spch_len: 5.104
+
+RIR_save_root: /mnt/inspurfs/home/wangpengyu/RVAE/data/rirs/train
+T60_range: [0.4,1]
+room_sz_range: [5,15,5,15,2,6]
+min_distance_to_wall: 1
+num_RIRs: 5000
+random_seed: 100

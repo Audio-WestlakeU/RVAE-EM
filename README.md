@@ -2,7 +2,7 @@
 
 Official PyTorch implementation of "**RVAE-EM: Generative speech dereverberation based on recurrent variational auto-encoder and convolutive transfer function**" which has been submitted to ICASSP 2024.
 
-[Paper](blah.com) | [Code](https://github.com/Audio-WestlakeU/RVAE-EM) | [DEMO](blah.com)
+[Paper](https://arxiv.org/abs/2309.08157) | [Code](https://github.com/Audio-WestlakeU/RVAE-EM) | [DEMO](https://github.com/Audio-WestlakeU/RVAE-EM) 
 
 ## 1. Introduction
 
@@ -30,11 +30,11 @@ The directory of paired RIRs should have two subdirectories `noisy/` and `clean/
 
 For testing, you should prepare directory of reverberant recordings with `.wav` files.
 
-We provide tools for simulating RIRs and generating testset, see `prepare_data/gen_rirs.py` and `prepare_data/gen_testset.py`.
+We provide tools for simulating RIRs and generating testset, run `prepare_data/gen_rirs.py` and `prepare_data/gen_testset.py` with config path `config/gen_testset.yaml`.
 
-### 2.3 Train proposed RVAE-EM-U (unsupervised)
+### 2.3 Train proposed RVAE-EM-U (unsupervised training)
 
-Unsupervised training with GPUs:
+Unsupervised training with multiple GPUs:
 ```
 # GPU setting
 export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
@@ -47,9 +47,9 @@ python train_u.py -c [config.json] -p [save_path]
 python train_u.py -c [config.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
 
-### 2.4 Train proposed RVAE-EM-S (supervised)
+### 2.4 Train proposed RVAE-EM-S (supervised fine-tuning)
 
-Supervised training with GPUs:
+Supervised training with multiple GPUs:
 ```
 # GPU setting
 export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
@@ -70,12 +70,35 @@ python train_s.py -c [config.json] -p [save_path] --start_ckpt [pretrained_check
 
 
 ### 2.5 Test & evaluate
+Both RVAE-EM-U and RVAE-EM-S use the same command to test and evaluate:
+```
+# GPU setting
+export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
+export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
+
+# test
+python enhance.py -c [config.json] -p [save_path] --ckpt [checkpoint_path]
+
+# evaluate (SISDR, PESQ, STOI)
+python eval.py -i [input .wav folder] -o [output .wav folder] -r [reference .wav folder]
+
+# evaluate (DNSMOS)
+python DNSMOS/dnsmos_local.py -t [output .wav folder]
+```
+
+If you are facing memory issues, try smaller `batch_size` or smaller `chunk_size` in class `MyEM`.
 ## 3. Performance
+Notice that the RVAE should be sufficiently trained.
 ## 4. Citation
 
-If you fine the code is helpful, please site the following article.
+If you find our work helpful, please cite
 ```
-
+@misc{wang2023rvaeem,
+      title={RVAE-EM: Generative speech dereverberation based on recurrent variational auto-encoder and convolutive transfer function}, 
+      author={Pengyu Wang and Xiaofei Li},
+      year={2023},
+      eprint={2309.08157},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS}
+}
 ```
-
-## 5. Reference
