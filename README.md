@@ -42,8 +42,7 @@ python prepare_data/gen_testset.py -c config/gen_trainset.yaml
 Unsupervised training with multiple GPUs:
 ```
 # GPU setting
-export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
-export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
+export CUDA_VISIBLE_DEVICES=[GPU_ids]
 
 # start a new training process or resume training (if possible)
 python train_u.py -c [config_U.json] -p [save_path]
@@ -59,8 +58,7 @@ You can also use smaller learning rate at the end of training.
 Supervised training with multiple GPUs:
 ```
 # GPU setting
-export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
-export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
+export CUDA_VISIBLE_DEVICES=[GPU_ids]
 
 # start a new training process
 python train_s.py -c [config_S.json] -p [save_path] --start_ckpt [checkpoint_from_unsupervised_training]
@@ -81,8 +79,7 @@ You can also use smaller learning rate at the end of training.
 Both RVAE-EM-U and RVAE-EM-S use the same command to test and evaluate:
 ```
 # GPU setting
-export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
-export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
+export CUDA_VISIBLE_DEVICES=[GPU_ids]
 
 # test
 python enhance.py -c [config.json] -p [save_path] --ckpt [checkpoint_path]
