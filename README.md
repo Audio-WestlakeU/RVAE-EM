@@ -30,7 +30,12 @@ The directory of paired RIRs should have two subdirectories `noisy/` and `target
 
 For testing, you should prepare directory of reverberant recordings with `.wav` files.
 
-We provide tools for simulating RIRs and generating testset, run `prepare_data/gen_rirs.py` and `prepare_data/gen_testset.py` with config path `config/gen_testset.yaml`.
+We provide tools for simulating RIRs and generating testset, try 
+```
+python prepare_data/gen_rirs.py -c config/gen_trainset.yaml
+python prepare_data/gen_rirs.py -c config/gen_testset.yaml
+python prepare_data/gen_testset.py -c config/gen_trainset.yaml
+```
 
 ### 2.3 Train proposed RVAE-EM-U (unsupervised training)
 
