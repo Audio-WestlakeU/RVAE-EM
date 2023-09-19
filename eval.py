@@ -88,7 +88,7 @@ def main():
     parser.add_argument("--out_path", "-o", required=True)  # output .wav folder
     parser.add_argument("--in_path", "-i", required=True)  # input .wav folder
     parser.add_argument("--ref_path", "-r", required=True)  # reference .wav folder
-    parser.add_argument("--sr", required=False)  # sample rate
+    parser.add_argument("--sr", default=16000)  # sample rate
 
     args = parser.parse_args()
 

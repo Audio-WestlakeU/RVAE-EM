@@ -19,11 +19,14 @@ class MyDataset(Dataset):
         **kwargs
     ):
         """
-        spch_path: 存放干净语音文件名的txt文件地址
-        rir_path: 存放RIR文件名的txt文件地址
-        fs: 采样率Hz
-        spch_len: 音频持续时间s
-        norm_mode: 归一化方式
+        Class: dataset for training and validating
+        Params:
+            spch_index_txt: clean speech path saved as .txt
+            rir_index_txt: reverberant RIR path saved as .txt
+            rir_target_index_txt: dry RIR path savd as .txt
+            fs: sample frequency
+            spch_len: segement length (default 5.104s (320frames))
+            norm_mode: normalization mode, noisy_time or time
         """
         self.fs = fs
         self.spch_len = spch_len
@@ -106,7 +109,6 @@ class MyDataset(Dataset):
         # 读取clean speech
         spch_filename, seq_start, seq_end = self.valid_seq_list[index]
         spch_ori, fs_spch = sf.read(spch_filename, dtype="float32")
-        # 检查采样率
         assert self.fs == fs_spch
         spch_ori = spch_ori.squeeze()
 
@@ -117,8 +119,7 @@ class MyDataset(Dataset):
 
         ##################################################################
         samples = int(self.fs * self.spch_len)
-        # 加入混响
-        # 读取RIR
+
         rir, fs_rir = sf.read(rir_list[index], dtype="float32")
         assert self.fs == fs_rir
         rir = rir.squeeze()
@@ -131,7 +132,7 @@ class MyDataset(Dataset):
         spch_dry = scipy.signal.fftconvolve(spch_ori, rir_target, mode="full")
         spch_dry = spch_dry[:samples]
 
-        # 归一化
+        # normalization
         if np.max(np.abs(spch_noisy)) > 0:
             scale = np.max(np.abs(spch_noisy))
             spch_noisy = spch_noisy / scale

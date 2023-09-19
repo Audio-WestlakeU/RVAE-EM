@@ -26,7 +26,7 @@ For training and validating, you should prepare directories of
  - reverberant-dry-paired RIRs (simulated with gpuRIR toolbox in our experiments)
 
 with `.wav` files.
-The directory of paired RIRs should have two subdirectories `noisy/` and `clean/`, with the same filenames present in both.
+The directory of paired RIRs should have two subdirectories `noisy/` and `target/`, with the same filenames present in both.
 
 For testing, you should prepare directory of reverberant recordings with `.wav` files.
 
@@ -41,11 +41,13 @@ export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
 export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
 
 # start a new training process or resume training (if possible)
-python train_u.py -c [config.json] -p [save_path]
+python train_u.py -c [config_U.json] -p [save_path]
 
 # use pretrained model parameters
-python train_u.py -c [config.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
+python train_u.py -c [config_U.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
+Fixed learning rate of 1e-4 is recommended. 
+You can also use smaller learning rate at the end of training.
 
 ### 2.4 Train proposed RVAE-EM-S (supervised fine-tuning)
 
@@ -56,15 +58,16 @@ export CUDA_VISIBLE_DEVICES=0,1 # for 2 gpus
 export CUDA_VISIBLE_DEVICES=0, # for 1 gpu
 
 # start a new training process
-python train_s.py -c [config.json] -p [save_path] --start_ckpt [checkpoint_from_unsupervised_training]
+python train_s.py -c [config_S.json] -p [save_path] --start_ckpt [checkpoint_from_unsupervised_training]
 
 # resume training
-python train_s.py -c [config.json] -p [save_path]
+python train_s.py -c [config_S.json] -p [save_path]
 
 # use pretrained model parameters
-python train_s.py -c [config.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
+python train_s.py -c [config_S.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
-
+Fixed learning rate of 1e-5 is recommended. 
+You can also use smaller learning rate at the end of training.
 
 
 
@@ -87,8 +90,16 @@ python DNSMOS/dnsmos_local.py -t [output .wav folder]
 ```
 
 If you are facing memory issues, try smaller `batch_size` or smaller `chunk_size` in class `MyEM`.
+
 ## 3. Performance
-Notice that the RVAE should be sufficiently trained.
+
+<div align="center">
+<image src="/figures/performance.jpg"  width="900" alt="Performance table" />
+</div>
+
+Notice that the RVAE should be trained sufficiently.
+In this table, we train RVAE-EM-U for over 180k steps and finetune RVAE-EM-S for over 80k steps.
+
 ## 4. Citation
 
 If you find our work helpful, please cite

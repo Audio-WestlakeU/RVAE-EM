@@ -20,12 +20,12 @@
         "norm_mode": "time"
     },
     "data_setting_test": {
-        "spch_dir": "/mnt/inspurfs/home/wangpengyu/pytorch-template-master/v8/data/wavs/test_REVERB/input"
+        "spch_dir": "/mnt/inspurfs/home/wangpengyu/pytorch-template-master/v8/data/wavs/test/input"
     },
     "batch_size": [
         64,
         64,
-        24
+        32
     ],
     "model": {
         "dim_x": 512,
@@ -108,7 +108,7 @@
     "optimizer": {
         "type": "adamw",
         "kwargs": {
-            "lr": 1e-04
+            "lr": 1e-05
         }
     },
     "lr_scheduler": {

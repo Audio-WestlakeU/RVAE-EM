@@ -447,7 +447,7 @@ def main():
                 vars(args),
                 vars(config),
             ),
-        )  # 多线程进行训练，每个GPU一个进程
+        )  
     else:
         train(0, vars(args), vars(config))
 

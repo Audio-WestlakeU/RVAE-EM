@@ -8,7 +8,7 @@ import numpy as np
 import random
 from glob import glob
 from math import ceil
-
+import logging
 from torchaudio import save
 from torchinfo import summary
 from torch.utils.data import DistributedSampler, DataLoader
@@ -23,81 +23,74 @@ from model.RVAE import RVAE as MODEL
 from dataset.testdataset import TestDataset as dataset
 from dataset.io import audio2EMinput_woDC_preprocess as data_preprocess
 from dataset.io import EMoutput_woDC2audio_postprocess as data_postprocess
-from my_EM import MyEM
+from model.my_EM import MyEM
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 warnings.simplefilter(action="ignore", category=UserWarning)
 
-import sys
-import os
-
-
-class Logger(object):
-    def __init__(self, filename="Default.log"):
-        self.terminal = sys.stdout
-        self.log = open(filename, "a")
-
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        pass
+logger = logging.getLogger("mylogger")
+logger.setLevel(logging.DEBUG)
 
 
 def inference(rank, a, c):
+
+    # create namespace of args and configs
     a = dict_to_namespace(a)
     c = dict_to_namespace(c)
 
-    if c.num_gpus > 1:
-        # DDP
-        init_process_group(
-            backend=c.dist_config.dist_backend,
-            init_method=c.dist_config.dist_url,
-            world_size=c.dist_config.world_size * c.num_gpus,
-            rank=rank,
-        )
+    # logger
+    if rank == 0:
+        fh = logging.FileHandler(os.path.join(a.save_path, "log.txt"), mode="a")
+        fh.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s")
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        logger.addHandler(fh)
+        logger.addHandler(ch)
 
-    # SEED
+    # seed
     seed = c.seed
     torch.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
-    seed = c.seed + rank
-    torch.cuda.manual_seed(seed)
+    seed_this_gpu = c.seed + rank
+    torch.cuda.manual_seed(seed_this_gpu)
 
-    # initialization
-    device = torch.device("cuda:{:d}".format(rank))
-    # device = "cpu"
-    torch.cuda.set_device(rank)
-    torch.cuda.empty_cache()
-
-    model = MODEL(**vars(c.model)).to(device)  # 模型都转换到对应的device
-
-    os.makedirs(a.save_path, exist_ok=True)
+    # create paths
     a.enhanced_path = a.save_path
     os.makedirs(a.enhanced_path, exist_ok=True)
-    # del_files_from_dir(a.enhanced_path)
+
+    # DDP initialization
+    init_process_group(
+        backend=c.dist_config.dist_backend,
+        init_method=c.dist_config.dist_url,
+        world_size=c.dist_config.world_size * c.num_gpus,
+        rank=rank,
+    )
+
+    # model initialization
+    device = torch.device("cuda:{:d}".format(rank))
+    torch.cuda.set_device(rank)
+    torch.cuda.empty_cache()
+    model = MODEL(**vars(c.model)).to(device)
 
     already_exist_wavs_filename = []
     for filepath_abs in glob(os.path.join(a.enhanced_path, "*")):
         if filepath_abs.endswith("wav"):
             already_exist_wavs_filename.append(os.path.basename(filepath_abs))
 
-    print("loading checkpoint from ", c.ckpt)
-    state_dict = load_checkpoint(c.ckpt, device)  # 有checkpoint的情形，读取
+    logger.info("loading checkpoint from ", c.ckpt)
+    state_dict = load_checkpoint(c.ckpt, device)
     model.load_state_dict(state_dict["params"])
     for name, param in model.named_parameters():
         param.requires_grad = False
 
-    path = os.path.abspath(os.path.dirname(__file__))
-    type = sys.getfilesystemencoding()
-    sys.stdout = Logger("1.txt")
-    # 创建项目文件夹，并print必要信息
     if rank == 0:
-        print(summary(model))
+        logger.info(summary(model))
 
-    # exit()
+    # dataloader
     testset = dataset(**vars(c.data_setting_test), **vars(c.stft_setting))
     test_sampler = DistributedSampler(testset) if c.num_gpus > 1 else None
     test_loader = DataLoader(
@@ -115,28 +108,24 @@ def inference(rank, a, c):
     del model
     torch.cuda.empty_cache()
     start_time = time.time()
+
+    # Inference
     with torch.cuda.amp.autocast():
         for i, batch in enumerate(test_loader):
-
             audio_input, filename = batch
             bs = audio_input.shape[0]
-
             if True:
                 audio_input = audio_input.to(device)
                 seq_len = audio_input.shape[1]
                 seq_len_input = ceil(seq_len / c.stft_setting.hop) * c.stft_setting.hop
                 audio_input_pad = torch.zeros([bs, seq_len_input]).to(device)
                 audio_input_pad[:, :seq_len] = audio_input
-
                 input = data_preprocess(audio_input_pad, **vars(c.stft_setting))
-
                 output_sptm = algo.EM(input)
-
                 output_wav = data_postprocess(output_sptm, **vars(c.stft_setting)).to(
                     "cpu"
                 )
                 output_wav = output_wav[:, :seq_len]
-
                 for isample in range(bs):
                     save_path = os.path.join(a.enhanced_path, filename[isample])
                     save(
@@ -146,7 +135,6 @@ def inference(rank, a, c):
                         ).unsqueeze(0),
                         c.stft_setting.fs,
                     )
-
             if rank == 0:
                 print(
                     "\r",
@@ -157,13 +145,13 @@ def inference(rank, a, c):
                     end="",
                     flush=True,
                 )
-    print(
+    logger.info(
         "Total inference time: {:.1f} minutes".format((time.time() - start_time) / 60)
     )
 
 
 def main():
-    print("Initializing Testing Process..")
+    logger.info("Initializing Testing Process..")
 
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d-%H-%M")
@@ -173,7 +161,7 @@ def main():
     parser.add_argument("--config", "-c", action="append", default=[])  # config
     parser.add_argument("--ckpt", required=True)  # checkpoint
     parser.add_argument(
-        "--save_path", "-p", default="inferenced_model"
+        "--save_path", "-p", default="inferenced_model" + current_time
     )  # output folder
 
     args = parser.parse_args()
@@ -185,14 +173,12 @@ def main():
 
     config = dict_to_namespace(json_config)  # 转换为属性字典
     config.ckpt = args.ckpt
-    build_env(
-        config, "config.json", args.save_path
-    )  # 将a.config复制到a.checkpoint_path/config.json
+    build_env(config, "config.json", args.save_path)
 
     if torch.cuda.is_available():
         config.num_gpus = torch.cuda.device_count()
         config.batch_size[2] = int(config.batch_size[2] / config.num_gpus)
-        print("Batch size per GPU :", config.batch_size)
+        logger.info("Batch size per GPU :", config.batch_size)
     else:
         raise ValueError("No GPU Devices!")
 
@@ -204,7 +190,7 @@ def main():
                 vars(args),
                 vars(config),
             ),
-        )  # 多线程进行训练，每个GPU一个进程
+        )
     else:
         inference(0, vars(args), vars(config))
 

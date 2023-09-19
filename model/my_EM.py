@@ -187,8 +187,6 @@ class MyEM:
                 torch.ones_like(H_tilde.diag(-p)), -p
             )
 
-        H_tilde_times_H_tilde = torch.mm(H_tilde.H, H_tilde)  # [T,T] complex
-
         numerator = torch.norm(
             Observed_data.unsqueeze(1) - torch.mm(H_tilde, Post_mean.unsqueeze(1)),
             "fro",
