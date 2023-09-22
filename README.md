@@ -6,7 +6,8 @@ Official PyTorch implementation of "**RVAE-EM: Generative speech dereverberation
 
 ## 1. Introduction
 
-As a speech dereverberation algorithm, RVAE-EM has two versions, RVAE-EM-U (unsupervised) and RVAE-EM-S (supervised).
+RVAE is a speech dereverberation algorithm.
+It has two versions, RVAE-EM-U (unsupervised trained) and RVAE-EM-S (supervised trained).
 
 The overview of RVAE-EM is
 
@@ -51,7 +52,7 @@ python train_u.py -c [config_U.json] -p [save_path]
 python train_u.py -c [config_U.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
 Fixed learning rate of 1e-4 is recommended. 
-You can also use smaller learning rate at the end of training.
+You can also use smaller learning rate at the end of training for better performance.
 
 ### 2.4 Train proposed RVAE-EM-S (supervised fine-tuning)
 
@@ -70,7 +71,7 @@ python train_s.py -c [config_S.json] -p [save_path]
 python train_s.py -c [config_S.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
 Fixed learning rate of 1e-5 is recommended. 
-You can also use smaller learning rate at the end of training.
+You can also use smaller learning rate at the end of training for better performance.
 
 
 
@@ -95,12 +96,30 @@ If you are facing memory issues, try smaller `batch_size` or smaller `chunk_size
 
 ## 3. Performance
 
+The performance reported in our paper is
 <div align="center">
 <image src="/figures/performance.jpg"  width="900" alt="Performance table" />
 </div>
 
-Notice that the RVAE should be trained sufficiently.
-In this table, we train RVAE-EM-U for over 180k steps and finetune RVAE-EM-S for over 80k steps.
+Our RVAE network should be trained sufficiently.
+In this table, we train and finetune networks in RVAE-EM-U and RVAE-EM-S for over 180k steps and 80k steps, respectively.
+<!-- We also provide the checkpoints of RVAE-EM-U and RVAE-EM-S in `/logs/ckpt`.
+Different from the reported version, both the checkpoints are trained/finetuned for about 200k steps. -->
+
+The typical validation total/IS/KL loss curves of unsupervised training are
+<div align="center">
+<image src="/figures/RVAE-U_val_loss.svg"  width="200" alt="Total loss" />
+<image src="/figures/RVAE-U_val_loss_IS.svg"  width="200" alt="IS loss" />
+<image src="/figures/RVAE-U_val_loss_KL.svg"  width="200" alt="KL loss" />
+</div>
+
+The typical validation total/IS/KL loss curves of supervised finetuning are
+<div align="center">
+<image src="/figures/RVAE-S_val_loss.svg"  width="200" alt="Total loss" />
+<image src="/figures/RVAE-S_val_loss_IS.svg"  width="200" alt="IS loss" />
+<image src="/figures/RVAE-S_val_loss_KL.svg"  width="200" alt="KL loss" />
+</div>
+
 
 ## 4. Citation
 
