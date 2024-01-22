@@ -2,7 +2,7 @@
 
 Official PyTorch implementation of "**RVAE-EM: Generative speech dereverberation based on recurrent variational auto-encoder and convolutive transfer function**" which has been accepted by ICASSP 2024.
 
-[Paper](https://arxiv.org/abs/2309.08157) | [Code](https://github.com/Audio-WestlakeU/RVAE-EM) | [DEMO](https://audio.westlake.edu.cn/Research/RVAE.htm) 
+[Paper](https://arxiv.org/abs/2309.08157) | [Code](https://github.com/Audio-WestlakeU/RVAE-EM) | [Demo](https://audio.westlake.edu.cn/Research/RVAE.htm) | [Pretrained Models](https://drive.google.com/drive/folders/1rI4h9hmJg7Gwv-pAVLUkRIzFOcxT-ZyJ?usp=drive_link) 
 
 ## 1. Introduction
 
