@@ -456,7 +456,6 @@ def main():
     else:
         train(0, vars(args), vars(config))
 
-
 if __name__ == "__main__":
     main()
         
