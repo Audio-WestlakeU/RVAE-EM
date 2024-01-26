@@ -2,7 +2,7 @@
 
 Official PyTorch implementation of "**RVAE-EM: Generative speech dereverberation based on recurrent variational auto-encoder and convolutive transfer function**" which has been accepted by ICASSP 2024.
 
-[Paper](https://arxiv.org/abs/2309.08157) | [Code](https://github.com/Audio-WestlakeU/RVAE-EM) | [Demo](https://audio.westlake.edu.cn/Research/RVAE.htm) | [Pretrained Models](https://drive.google.com/drive/folders/1rI4h9hmJg7Gwv-pAVLUkRIzFOcxT-ZyJ?usp=drive_link) 
+[Paper](https://arxiv.org/abs/2309.08157) | [Code](https://github.com/Audio-WestlakeU/RVAE-EM) | [Demo](https://audio.westlake.edu.cn/Research/RVAE.htm)
 
 ## 1. Introduction
 
@@ -51,8 +51,8 @@ python train_u.py -c [config_U.json] -p [save_path]
 # use pretrained model parameters
 python train_u.py -c [config_U.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
-Fixed learning rate of 1e-4 is recommended. 
-You can also use smaller learning rate at the end of training for better performance.
+Maximum learning rate of 1e-4 is recommended. 
+One can also use smaller learning rate at the end of training for better performance.
 
 ### 2.4 Train proposed RVAE-EM-S (supervised fine-tuning)
 
@@ -70,8 +70,8 @@ python train_s.py -c [config_S.json] -p [save_path]
 # use pretrained model parameters
 python train_s.py -c [config_S.json] -p [save_path] --start_ckpt [pretrained_checkpoint]
 ```
-Fixed learning rate of 1e-5 is recommended. 
-You can also use smaller learning rate at the end of training for better performance.
+Maximum learning rate of 1e-4 is recommended. 
+One can also use smaller learning rate at the end of training for better performance.
 
 
 
@@ -101,8 +101,9 @@ The performance reported in our paper is
 <image src="/figures/performance.jpg"  width="900" alt="Performance table" />
 </div>
 
-Our RVAE network should be trained sufficiently.
-In this table, we train and finetune networks in RVAE-EM-U and RVAE-EM-S for over 180k steps and 80k steps, respectively.
+Notice that the RVAE network should be trained sufficiently.
+The pretrain models can be download [here](https://drive.google.com/drive/folders/1rI4h9hmJg7Gwv-pAVLUkRIzFOcxT-ZyJ?usp=drive_link).
+<!-- In this table, we train and finetune networks in RVAE-EM-U and RVAE-EM-S for over 180k steps and 80k steps, respectively. -->
 <!-- We also provide the checkpoints of RVAE-EM-U and RVAE-EM-S in `/logs/ckpt`.
 Different from the reported version, both the checkpoints are trained/finetuned for about 200k steps. -->
 
