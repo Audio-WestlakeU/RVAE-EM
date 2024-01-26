@@ -108,7 +108,7 @@
     "optimizer": {
         "type": "adamw",
         "kwargs": {
-            "lr": 1e-05
+            "lr": 1e-04
         }
     },
     "lr_scheduler": {
