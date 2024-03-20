@@ -126,12 +126,14 @@ The typical validation total/IS/KL loss curves of supervised finetuning are
 
 If you find our work helpful, please cite
 ```
-@misc{wang2023rvaeem,
-      title={RVAE-EM: Generative speech dereverberation based on recurrent variational auto-encoder and convolutive transfer function}, 
-      author={Pengyu Wang and Xiaofei Li},
-      year={2023},
-      eprint={2309.08157},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS}
-}
+@INPROCEEDINGS{10447010,
+  author={Wang, Pengyu and Li, Xiaofei},
+  booktitle={ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={RVAE-EM: Generative Speech Dereverberation Based On Recurrent Variational Auto-Encoder And Convolutive Transfer Function}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={496-500},
+  keywords={Transfer functions;Signal processing algorithms;Estimation;Speech enhancement;Probabilistic logic;Approximation algorithms;Reverberation;Speech enhancement;speech dereverberation;variational auto-encoder;convolutive transfer function;unsupervised learning},
+  doi={10.1109/ICASSP48485.2024.10447010}}
 ```
